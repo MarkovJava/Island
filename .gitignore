@@ -11,6 +11,8 @@
 .mtj.tmp/
 
 # Package Files #
+.gitignore
+.idea
 *.jar
 *.war
 *.nar
