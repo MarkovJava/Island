@@ -20,4 +20,9 @@ public class Horse extends Herbivores {
     public void run() {
         move();
     }
+
+    @Override
+    public void multiply() {
+
+    }
 }
