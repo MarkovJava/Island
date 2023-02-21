@@ -1,46 +1,43 @@
 package com.javarush.markov.island.engine;
 
-import com.javarush.markov.island.objects.simulation.field.PlayingField;
-import com.javarush.markov.island.objects.simulation.organism.Organism;
+import com.javarush.markov.island.model.location.Location;
+import com.javarush.markov.island.model.organism.Organism;
+import com.javarush.markov.island.model.sector.Sector;
+import com.javarush.markov.island.view.View;
 
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SimpleEngine implements Engine {
 
-    private final CopyOnWriteArrayList<? extends Organism> objectsSimulation;
+    private final Location location;
 
-    private final PlayingField playingField;
+    private View view;
 
-    public SimpleEngine(CopyOnWriteArrayList<? extends Organism> objectsSimulation, PlayingField playingField) {
-        this.objectsSimulation = objectsSimulation;
-        this.playingField = playingField;
+    public SimpleEngine(Location location, View view) {
+        this.location = location;
+        this.view = view;
     }
 
     @Override
-    public void start() {
-        fillInLocation();
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        System.out.println(playingField);
-        System.out.println("-----------------------------");
-        System.out.println(objectsSimulation);
-        for (Organism organism : objectsSimulation) {
-            executorService.execute(organism);
+    public void run() {
+        ExecutorService service = Executors.newCachedThreadPool();
+        while (true) {
+            view.show(location);
+            for (Sector sector : location.getSectorAll()) {
+                if(!sector.getOrganismList().isEmpty())
+                    for (Organism organism : sector.getOrganismList()) {
+                        service.submit(organism);
+                    }
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-        System.out.println("+++++++++++++++++++++++++++++");
-        System.out.println(playingField);
     }
 
-    void fillInLocation() {
-        playingField.putAll(objectsSimulation, 1,1);
-    }
 
-    @Override
-    public String toString() {
-        return "SimpleEngine{" +
-                "objectsSimulation=" + objectsSimulation +
-                ", playingField=" + playingField +
-                '}';
-    }
+
 }
